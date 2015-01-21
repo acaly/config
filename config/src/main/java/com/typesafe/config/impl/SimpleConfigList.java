@@ -224,7 +224,8 @@ final class SimpleConfigList extends AbstractConfigValue implements ConfigList, 
         if (options.getComments() && !v.origin().comments().isEmpty()) {
             shouldInline = false;
         }
-        if (v.valueType() == ConfigValueType.OBJECT || v.valueType() == ConfigValueType.LIST) {
+        if (v.resolveStatus() == ResolveStatus.UNRESOLVED ||
+        		v.valueType() == ConfigValueType.OBJECT || v.valueType() == ConfigValueType.LIST) {
             shouldInline = false;
         }
         if (shouldInline) {
@@ -232,7 +233,7 @@ final class SimpleConfigList extends AbstractConfigValue implements ConfigList, 
                 indent(sb, indent, options);
             }
             v.render(sb, indent, false, options);
-            sb.append(", ");
+            sb.append(options.getFormatted() ? ", " : ",");
             return true;
         } else {
             if (lineNotFinished) {
@@ -293,8 +294,8 @@ final class SimpleConfigList extends AbstractConfigValue implements ConfigList, 
                         separatorCount = 3;
                         sb.append(", \n");
                     } else {
-                        separatorCount = 2;
-                        sb.append(", ");
+                        separatorCount = 1;
+                        sb.append(",");
                     }
                 }
             }
