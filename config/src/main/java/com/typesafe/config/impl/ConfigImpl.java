@@ -203,6 +203,8 @@ public class ConfigImpl {
     public static ConfigValue fromAnyRef(Object object, String originDescription, String[] comments) {
         ConfigOrigin valueOrigin = valueOrigin(originDescription, comments);
         ConfigOrigin origin = valueOrigin(originDescription);
+        if (object != null && object instanceof ConfigValue)
+            object = ((ConfigValue) object).unwrapped();
         return fromAnyRef(object, valueOrigin, origin, FromMapMode.KEYS_ARE_KEYS);
     }
 
@@ -211,6 +213,8 @@ public class ConfigImpl {
             Map<String, ? extends Object> pathMap, String originDescription, String[] comments) {
         ConfigOrigin valueOrigin = valueOrigin(originDescription, comments);
         ConfigOrigin origin = valueOrigin(originDescription);
+        if (pathMap != null && pathMap instanceof ConfigValue)
+            pathMap = (Map<String, ? extends Object>) ((ConfigValue) pathMap).unwrapped();
         return (ConfigObject) fromAnyRef(pathMap, valueOrigin, origin,
                 FromMapMode.KEYS_ARE_PATHS);
     }
@@ -252,6 +256,8 @@ public class ConfigImpl {
                 return ConfigNumber.newNumber(valueOrigin,
                         ((Number) object).doubleValue(), null);
             }
+        } else if (object instanceof AbstractConfigValue) {
+            return (AbstractConfigValue) object;
         } else if (object instanceof Map) {
             if (((Map<?, ?>) object).isEmpty())
                 return emptyObject(valueOrigin);
